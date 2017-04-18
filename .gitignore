@@ -1,0 +1,8 @@
+output
+lines
+task
+xml
+*.pyc
+*.tgz
+lines.txt
+*.zip
