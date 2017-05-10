@@ -61,3 +61,13 @@ For now we just run this processing
 ```
 sh add_author_std.sh
 ```
+
+### TLDR
+
+Run
+
+```
+sh download_IAM_data.sh
+python extract_all_words_lines.py
+sh add_author_std.sh
+```
