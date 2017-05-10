@@ -56,3 +56,8 @@ This code extracts all word and lines:
 ### Additional Processing
 
 Additional process may be done on the dataset. This can be done to remove lines marked with errors, remove images are are problematic, compute author specific statistics, etc.
+
+For now we just run this processing
+```
+sh add_author_std.sh
+```
