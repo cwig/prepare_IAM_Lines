@@ -22,6 +22,7 @@ with open("task/testset.txt") as f:
 author_mapping, lines_gts, word_gts = prep_iam_writer_map.get_mapping('xml')
 
 def prep_set(data_set, lines_gts, author_mapping):
+    tmp_cnt = 0
 
     all_authors = defaultdict(lambda: [])
     all_authors_baseline = defaultdict(lambda: [])
@@ -36,7 +37,12 @@ def prep_set(data_set, lines_gts, author_mapping):
             print "There was an issue with ", image_file
             continue
 
-        author_id, avg_line, avg_full = author_mapping[line_id]
+
+        # if lines_gts[d]['err']:
+        #     continue
+
+        if lines_gts[d]['gt'].startswith("#"):
+            continue
 
         profile = np.sum(255 - img, axis=1)
         center_of_mass = ndimage.measurements.center_of_mass(profile)[0]
@@ -45,26 +51,29 @@ def prep_set(data_set, lines_gts, author_mapping):
         std = (profile * (distances ** 2.0)).sum() / profile.sum()
         std = np.sqrt(std)
 
+        author_id, avg_line, avg_full = author_mapping[line_id]
         all_authors[author_id].append(std)
         all_authors_baseline[author_id].append(avg_line)
+
+        if line_id == 'b06-008' or True:
+            tmp_cnt += 1
+
+    print "TMP CNT", tmp_cnt
 
     all_vals = []
     all_ratios = []
     iteresting_values = []
     all_lines = []
 
-    for k, v in all_authors.iteritems():
+    print "Length", len(all_authors)
+    # 0/0
 
+    for k, v in all_authors.iteritems():
         std_mean = np.mean(v)
         line_mean = np.mean(all_authors_baseline[k])
         all_vals.append(std_mean)
         all_ratios.append(std_mean / line_mean)
         all_lines.append(line_mean)
-
-    # mu, sigma = norm.fit(all_lines)
-    # mu, sigma = norm.fit(all_vals)
-    # mu, sigma = norm.fit(all_ratios)
-
     avg_ratio = np.mean(all_ratios)
 
     output_data = []
@@ -110,8 +119,6 @@ training_set = generate_word_dataset(training_set, word_gts)
 val1_set = generate_word_dataset(val1_set, word_gts)
 val2_set = generate_word_dataset(val2_set, word_gts)
 test_set = generate_word_dataset(test_set, word_gts)
-
-print len(training_set)
 
 training_output, avg_ratio = prep_set(training_set, word_gts, author_mapping)
 print "Training Avg Ratio: ", avg_ratio

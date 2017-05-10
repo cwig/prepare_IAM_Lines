@@ -36,7 +36,13 @@ def get_key_value(xml_file):
     dys = []
     line_gts = {}
     word_gts = {}
+
     for lines in handwritten_part:
+
+        in_error = False
+        if lines.attrib['segmentation'] == 'err':
+            in_error = True
+
         lby = float(lines.attrib['lby'])
         uby = float(lines.attrib['uby'])
 
@@ -49,10 +55,16 @@ def get_key_value(xml_file):
         h = HTMLParser()
         line_text = h.unescape(lines.attrib['text'])
 
-        line_gts[lines.attrib['id']] = line_text
+        line_gts[lines.attrib['id']] = {
+            "gt": line_text,
+            "err": in_error
+        }
         for word in lines.findall('word'):
             word_text = h.unescape(word.attrib['text'])
-            word_gts[word.attrib['id']] = word_text
+            word_gts[word.attrib['id']] = {
+                "gt": word_text,
+                "err": in_error
+            }
 
     return root.attrib['id'], root.attrib['writer-id'], np.median(lbys), np.median(dys), line_gts, word_gts
 
