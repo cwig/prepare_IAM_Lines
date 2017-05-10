@@ -6,3 +6,5 @@ xml
 *.tgz
 lines.txt
 *.zip
+words
+raw_gts

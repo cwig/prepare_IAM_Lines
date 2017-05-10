@@ -37,13 +37,6 @@ def prep_set(data_set, lines_gts, author_mapping):
             print "There was an issue with ", image_file
             continue
 
-
-        # if lines_gts[d]['err']:
-        #     continue
-
-        if lines_gts[d]['gt'].startswith("#"):
-            continue
-
         profile = np.sum(255 - img, axis=1)
         center_of_mass = ndimage.measurements.center_of_mass(profile)[0]
 

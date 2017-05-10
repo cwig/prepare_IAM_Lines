@@ -23,6 +23,13 @@ Parsing from the xml would probably be the most "fair" method because it is prob
 
 Depending on the processing of this text will affect the WER and CER of the final results. If punctuation is considered its own word, that may significantly improve WER because often a system will accurately predict punctuation.
 
+### Download IAM data
+This requires a IAM account. To download all of the data that will be need to run this code run the following script.
+
+
+`sh download_IAM_data.sh`
+
+
 ### Extracting Ground Truth
 
 We provide two ways to extract the ground truth. They are saved in `raw_gts` in word/line and xml/txt directories. Each set is saved in the format:
@@ -32,13 +39,20 @@ We provide two ways to extract the ground truth. They are saved in `raw_gts` in 
     {
         "gt": string,
         "image_path": string,
-        "error": bool
+        "err": bool
     },
     {
         "gt": string,
         "image_path": string,
-        "error": bool
+        "err": bool
     },
     ...
 ]
 ```
+
+This code extracts all word and lines:  
+`python extract_all_words_lines.py`
+
+### Additional Processing
+
+Additional process may be done on the dataset. This can be done to remove lines marked with errors, remove images are are problematic, compute author specific statistics, etc.
