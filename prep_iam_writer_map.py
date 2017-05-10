@@ -1,7 +1,7 @@
 import sys
 
 
-
+from HTMLParser import HTMLParser
 import xml.etree.ElementTree
 from os import listdir
 from os.path import isfile, join
@@ -13,13 +13,15 @@ def get_mapping(xml_folder):
     onlyfiles = [join(xml_folder, f) for f in listdir(xml_folder) if isfile(join(xml_folder, f))]
 
     all_line_gts = {}
+    all_word_gts = {}
     mapping = {}
     for f in onlyfiles:
-        form_id, writer_id, avg_line, avg_full, line_gts = get_key_value(f)
+        form_id, writer_id, avg_line, avg_full, line_gts, word_gts = get_key_value(f)
         mapping[form_id] = writer_id, avg_line, avg_full
         all_line_gts.update(line_gts)
+        all_word_gts.update(word_gts)
 
-    return mapping, all_line_gts
+    return mapping, all_line_gts, all_word_gts
 
 def get_namespace(element):
     m = re.match('\{.*\}', element.tag)
@@ -33,6 +35,7 @@ def get_key_value(xml_file):
     lbys = []
     dys = []
     line_gts = {}
+    word_gts = {}
     for lines in handwritten_part:
         lby = float(lines.attrib['lby'])
         uby = float(lines.attrib['uby'])
@@ -43,9 +46,15 @@ def get_key_value(xml_file):
         dys.append(dsy - asy)
         lbys.append(lby - uby)
 
-        line_gts[lines.attrib['id']] = lines.attrib['text']
+        h = HTMLParser()
+        line_text = h.unescape(lines.attrib['text'])
 
-    return root.attrib['id'], root.attrib['writer-id'], np.median(lbys), np.median(dys), line_gts
+        line_gts[lines.attrib['id']] = line_text
+        for word in lines.findall('word'):
+            word_text = h.unescape(word.attrib['text'])
+            word_gts[word.attrib['id']] = word_text
+
+    return root.attrib['id'], root.attrib['writer-id'], np.median(lbys), np.median(dys), line_gts, word_gts
 
 
 if __name__ == "__main__":

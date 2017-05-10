@@ -7,10 +7,6 @@ import cv2
 from collections import defaultdict
 import json
 
-#with open("lines.txt") as f:
-#    lines = [s for s in f.readlines()]
-#lines = [s.strip() for s in lines if not s.startswith('#')]
-
 with open("task/trainset.txt") as f:
     training_set = set([s.strip() for s in f.readlines()])
 
@@ -32,7 +28,7 @@ def prep_set(data_set, lines_gts, author_mapping):
     for d in data_set:
         split_name = d.split('-')
         folder_and_base = "{}/{}-{}/{}".format(split_name[0], split_name[0], split_name[1], d)
-        image_file = "lines/{}.png".format(folder_and_base)
+        image_file = "words/{}.png".format(folder_and_base)
         line_id = "{}-{}".format(split_name[0], split_name[1])
 
         img = cv2.imread(image_file, 0)
@@ -75,7 +71,7 @@ def prep_set(data_set, lines_gts, author_mapping):
     for d in data_set:
         split_name = d.split('-')
         folder_and_base = "{}/{}-{}/{}".format(split_name[0], split_name[0], split_name[1], d)
-        image_file = "lines/{}.png".format(folder_and_base)
+        image_file = "words/{}.png".format(folder_and_base)
         line_id = "{}-{}".format(split_name[0], split_name[1])
 
         img = cv2.imread(image_file, 0)
@@ -96,11 +92,32 @@ def prep_set(data_set, lines_gts, author_mapping):
 
     return output_data, avg_ratio
 
-training_output, avg_ratio = prep_set(training_set, lines_gts, author_mapping)
+def generate_word_dataset(data_set, word_gts):
+    line_to_word = defaultdict(list)
+    for word_id in word_gts.keys():
+        split_name = word_id.split('-')
+        line_id = "{}-{}-{}".format(split_name[0], split_name[1], split_name[2])
+        line_to_word[line_id].append(word_id)
+
+    all_ids = []
+    for d in data_set:
+        all_ids.extend(line_to_word[d])
+
+    return all_ids
+
+
+training_set = generate_word_dataset(training_set, word_gts)
+val1_set = generate_word_dataset(val1_set, word_gts)
+val2_set = generate_word_dataset(val2_set, word_gts)
+test_set = generate_word_dataset(test_set, word_gts)
+
+print len(training_set)
+
+training_output, avg_ratio = prep_set(training_set, word_gts, author_mapping)
 print "Training Avg Ratio: ", avg_ratio
-val1_output, _ = prep_set(val1_set, lines_gts, author_mapping)
-val2_output, _ = prep_set(val2_set, lines_gts, author_mapping)
-test_output, _ = prep_set(test_set, lines_gts, author_mapping)
+val1_output, _ = prep_set(val1_set, word_gts, author_mapping)
+val2_output, _ = prep_set(val2_set, word_gts, author_mapping)
+test_output, _ = prep_set(test_set, word_gts, author_mapping)
 
 
 print len(training_output)
