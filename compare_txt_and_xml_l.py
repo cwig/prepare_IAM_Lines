@@ -35,3 +35,6 @@ if __name__ == "__main__":
 
         print "Sym Diff (No whitespace, should be zero):", len(xml_set ^ txt_set)
         print ""
+
+
+        # re.sub("([^ ])'" , "\g<1> '", text1)
